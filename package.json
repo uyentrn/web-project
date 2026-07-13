@@ -1,0 +1,40 @@
+{
+  "name": "perfume-ecommerce-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Perfume e-commerce API",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
+    "prisma:generate": "prisma generate --schema=src/models/schema.prisma",
+    "prisma:migrate:deploy": "prisma migrate deploy --schema=src/models/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "serverless-http": "^3.2.0"
+  },
+  "devDependencies": {
+    "jest": "^30.0.5",
+    "prisma": "^6.19.0",
+    "serverless": "^4.17.1",
+    "serverless-offline": "^14.4.0",
+    "supertest": "^7.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js",
+      "!src/handler.js"
+    ]
+  }
+}

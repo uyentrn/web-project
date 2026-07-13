@@ -1,56 +1,100 @@
 # Perfume E-Commerce Backend
 
-Hệ thống Backend cho trang web bán nước hoa, được xây dựng với kiến trúc Layered Architecture, tối ưu hóa cho môi trường Serverless trên AWS.
+Node.js/Express API for a perfume store. The code follows a layered design: routes map HTTP endpoints, middleware handles cross-cutting concerns, controllers translate HTTP requests, services own domain operations, and Prisma persists data in PostgreSQL.
 
-## 1. Công nghệ sử dụng
-- Language: Node.js (TypeScript)
-- Framework: Serverless Framework
-- ORM: Prisma
-- Database: PostgreSQL (Managed via Supabase/Neon/RDS)
-- Cloud Provider: AWS (Lambda, API Gateway, S3)
-
-## 2. Cấu trúc dự án
+## Project structure
 
 ```text
-perfume-store-backend/
-├── src/
-│   ├── config/          # Cấu hình môi trường
-│   ├── controllers/     # Xử lý API request
-│   ├── middlewares/     # Bảo mật (JWT), Validation
-│   ├── models/          # Schema Database (Prisma)
-│   ├── routes/          # Định nghĩa endpoint
-│   ├── services/        # Business logic
-│   └── app.js           # Entry point
-├── tests/               # Unit tests
-├── scripts/             # Database seeding
-└── serverless.yml       # Cấu hình triển khai AWS
+src/
+  bootstrap.js       # Production composition root
+  handler.js         # AWS Lambda adapter
+  server.js          # Local/container HTTP entry point
+  controllers/       # HTTP orchestration and response envelopes
+  middlewares/       # Authentication, roles, validation, errors, logging
+  models/            # Prisma schema
+  routes/            # Endpoint registration
+  services/          # Domain and persistence operations
+tests/               # Jest unit/controller/route tests
+Dockerfile           # Production image
+docker-compose.yml   # Local PostgreSQL
+serverless.yml       # AWS Lambda + HTTP API deployment
 ```
-## 3. Hướng dẫn cài đặt (Local Development)
 
-### Bước 1: Cài đặt Dependencies
-```text
-npm install
-```
-### Bước 2: Thiết lập biến môi trường
-Tạo file .env từ file .env.example:
-```text
+## Prerequisites
+
+- Node.js 22+
+- PostgreSQL 16+ (or a managed PostgreSQL-compatible service)
+- Docker and Docker Compose for the local database/container workflow
+- AWS credentials and Serverless Framework access for Lambda deployment
+
+## Local development
+
+```bash
+npm ci
 cp .env.example .env
-```
-Chỉnh sửa nội dung file .env với DATABASE_URL và các keys
-
-### Bước 3: Chạy ứng dụng Local
-Sử dụng serverless-offline để giả lập AWS trên máy tính:
-```text
+docker compose up -d database
+npm run prisma:generate
 npm run dev
 ```
-*API sẽ chạy tại: http://localhost:3000*
 
-## 4. Triển khai (Deployment)
-Để đẩy code lên AWS Lambda:
-```text
-serverless deploy
+The API listens on `http://localhost:3000`. Run automated tests with `npm test`, or collect coverage with `npm run test:coverage`.
+
+`DATABASE_URL` and `JWT_SECRET` are mandatory. Never commit `.env`; use a separate secret per environment.
+
+## Database migrations
+
+Use Prisma migrations in CI/CD, never `prisma migrate dev` against production:
+
+```bash
+npm run prisma:migrate:deploy
 ```
 
-## 5. Tài liệu API
-- Xem chi tiết tại: [specification](./docs/[EN]_api_spec.md) hoặc [đặc tả](./docs/[VI]_api_spec.md)
-- Xem thiết kế database tại: [specification](./docs/[EN]_database_spec.md) hoặc [đặc tả](./docs/[VI]_database_spec.md)
+This repository currently has a Prisma schema but no committed migration history. Create and review the initial migration in a non-production environment before any deployment; until then, `prisma:migrate:deploy` cannot initialize a fresh production database. Prisma recommends `migrate deploy` in an automated deployment pipeline for production changes. [Prisma migration guidance](https://docs.prisma.io/docs/orm/v6/prisma-migrate/workflows/development-and-production)
+
+## Docker deployment
+
+Build and run the API against a managed PostgreSQL database:
+
+```bash
+docker build -t perfume-ecommerce-api .
+docker run --rm -p 3000:3000 --env-file .env perfume-ecommerce-api
+```
+
+`docker-compose.yml` intentionally starts only PostgreSQL for local development. Run schema migrations separately before starting the API.
+
+## AWS Lambda deployment
+
+Set production secrets through your CI/CD system or AWS Secrets Manager/SSM and expose them as `DATABASE_URL` and `JWT_SECRET` during deployment. Do not put production secrets in `serverless.yml` or a local `.env` file.
+
+```bash
+npm ci
+npm run prisma:generate
+npm run prisma:migrate:deploy
+npx serverless deploy --stage prod
+```
+
+The Serverless configuration deploys one ARM64 Node.js 22 Lambda behind API Gateway HTTP API, with a 29-second timeout and 30-day log retention. Serverless HTTP API events support a catch-all API handler and produce the endpoint URL on deployment. [Serverless HTTP API reference](https://www.serverless.com/framework/docs/providers/aws/events/http-api)
+
+## Security and operations
+
+- Bearer JWT authentication with issuer/audience verification
+- Role middleware for administrative catalog writes
+- JSON-body validation plus controller input checks
+- Standardized JSON error responses, including malformed JSON and 404s
+- Structured request logging that excludes request bodies, headers, tokens, and credentials
+- Docker runs as the non-root `node` user
+- `.env`, coverage output, dependencies, and deployment artifacts are ignored by Git
+
+## Current limitations
+
+- User, brand, wishlist, and payment domain services/controllers are not implemented. Their registered endpoints return `501 Not Implemented`.
+- The data model has no user role field and access tokens currently do not issue role claims, so catalog write endpoints cannot be used until role provisioning is designed.
+- There are no committed Prisma migrations yet.
+- Production database networking, TLS/CA configuration, backups, monitoring/alerting, rate limiting, CORS policy, WAF, and CI/CD secret integration require environment-specific infrastructure decisions.
+- Payment processing, webhook verification, cancellation/refund workflows, and user-profile lifecycle are intentionally out of scope of the implemented services.
+
+## Specifications
+
+- [English API specification](./docs/[EN]_api_spec.md)
+- [Vietnamese API specification](./docs/[VI]_api_spec.md)
+- [Prisma schema](./src/models/schema.prisma)

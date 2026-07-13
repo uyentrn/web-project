@@ -1,0 +1,40 @@
+service: perfume-ecommerce-api
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: ${env:AWS_REGION, 'ap-southeast-1'}
+  stage: ${opt:stage, env:STAGE, 'dev'}
+  architecture: arm64
+  memorySize: 512
+  timeout: 29
+  logRetentionInDays: 30
+  httpApi:
+    cors: false
+  environment:
+    NODE_ENV: production
+    DATABASE_URL: ${env:DATABASE_URL}
+    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_ISSUER: ${env:JWT_ISSUER, 'perfume-ecommerce-api'}
+    JWT_AUDIENCE: ${env:JWT_AUDIENCE, 'perfume-ecommerce-client'}
+    ACCESS_TOKEN_TTL_SECONDS: ${env:ACCESS_TOKEN_TTL_SECONDS, '900'}
+    REFRESH_TOKEN_TTL_SECONDS: ${env:REFRESH_TOKEN_TTL_SECONDS, '604800'}
+    BCRYPT_ROUNDS: ${env:BCRYPT_ROUNDS, '12'}
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - httpApi: '*'
+
+package:
+  patterns:
+    - '!tests/**'
+    - '!docs/**'
+    - '!.env*'
+    - '!docker-compose.yml'
+    - '!Dockerfile'
+
+plugins:
+  - serverless-offline

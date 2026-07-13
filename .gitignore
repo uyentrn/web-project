@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+npm-debug.log*
+
+node_modules/
+coverage/
+.serverless/
+.prisma/
+.codex/
+.agents/
+
