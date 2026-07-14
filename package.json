@@ -1,5 +1,5 @@
 {
-  "name": "perfume-ecommerce-backend",
+  "name": "BE",
   "version": "1.0.0",
   "private": true,
   "description": "Perfume e-commerce API",
@@ -7,17 +7,22 @@
   "engines": {
     "node": ">=22.0.0"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node src/server.js",
     "test": "jest --runInBand",
     "test:coverage": "jest --coverage --runInBand",
-    "prisma:generate": "prisma generate --schema=src/models/schema.prisma",
-    "prisma:migrate:deploy": "prisma migrate deploy --schema=src/models/schema.prisma"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "bcryptjs": "^3.0.2",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "serverless-http": "^3.2.0"
