@@ -20,13 +20,21 @@ class AuthService {
     if (existingUser) throw conflict('An account with this email already exists.');
 
     try {
-      const user = await this.prisma.user.create({
-        data: { 
-          email: normalizedEmail, 
-          passwordHash: await this.passwordHasher.hash(password), 
-          name: normalizeOptionalText(name, 'Name'),
-          role:"CLIENT" 
-        },
+      const user = await this.prisma.$transaction(async (tx) => {
+        const createdUser = await tx.user.create({
+          data: { 
+            email: normalizedEmail, 
+            passwordHash: await this.passwordHasher.hash(password), 
+            name: normalizeOptionalText(name, 'Name'),
+            role:"CLIENT" 
+          },
+        });
+        await tx.cart.create({
+          data: {
+            userId: createdUser.id,
+          },
+        });
+        return createdUser;
       });
       return this.#createSessionTokens(user);
     } catch (error) {

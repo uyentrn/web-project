@@ -1,0 +1,294 @@
+### ============================================
+### Base Configuration
+### ============================================
+
+@baseUrl = http://localhost:3000/api
+
+@clientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyODhkZmI4Yi1iZWYzLTRjN2UtOTdmZC1lNWEyZWJhODdhYTciLCJzaWQiOiJmYjRiZmFhZi1lMTY4LTQ2ZDAtYmE2MC0wYzUwMzhkMTBmMjciLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzg0NDczODU0LCJleHAiOjE3ODQ0NzQ3NTQsImF1ZCI6InBlcmZ1bWUtZWNvbW1lcmNlLWNsaWVudCIsImlzcyI6InBlcmZ1bWUtZWNvbW1lcmNlLWFwaSJ9.npXlsCemzdl6c271D3i3rx8WhyaHIz6i-UUVu6LvSDg
+@adminToken = 
+@accessToken =
+
+### Replace with real IDs after seeding
+@orderId = 
+@otherUserOrderId = 
+@invalidOrderId = invalid-order-id
+
+### ============================================
+### CLIENT - CHECKOUT
+### ============================================
+
+### 1. Checkout - Success ---- 201
+POST {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "shippingAddress": "123 Nguyen Trai, Ho Chi Minh City"
+}
+
+###
+
+### 2. Checkout - No Token ---- 401
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "shippingAddress": "123 Nguyen Trai"
+}
+
+###
+
+### 3. Checkout - Admin Role ---- 403
+POST {{baseUrl}}/orders
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "shippingAddress": "123 Nguyen Trai"
+}
+
+###
+
+### 4. Checkout - Empty Body ---- 400
+POST {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### 5. Checkout - Missing shippingAddress ---- 400
+POST {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+}
+
+###
+
+### 6. Checkout - Empty shippingAddress ---- 400
+POST {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "shippingAddress": ""
+}
+
+###
+
+### 7. Checkout - Empty Cart ---- 400
+POST {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "shippingAddress": "123 Nguyen Trai"
+}
+
+### NOTE:
+### Run this after the cart has been emptied.
+
+###
+
+### 8. Checkout - Insufficient Stock ---- 400
+POST {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "shippingAddress": "123 Nguyen Trai"
+}
+
+### NOTE:
+### Prepare a cart containing a variant whose stock is smaller than the requested quantity.
+
+###
+
+### ============================================
+### CLIENT - GET ORDERS
+### ============================================
+
+### 1. Get Orders - Success ---- 200
+GET {{baseUrl}}/orders
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 2. Get Orders - limit ---- 200
+GET {{baseUrl}}/orders?limit=5
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 3. Get Orders - offset ---- 200
+GET {{baseUrl}}/orders?offset=5
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 4. Get Orders - limit & offset ---- 200
+GET {{baseUrl}}/orders?limit=5&offset=5
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 5. Get Orders - limit > 100 ---- 400
+GET {{baseUrl}}/orders?limit=101
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 6. Get Orders - limit = 0 ---- 400
+GET {{baseUrl}}/orders?limit=0
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 7. Get Orders - Negative limit ---- 400
+GET {{baseUrl}}/orders?limit=-1
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 8. Get Orders - Negative offset ---- 400
+GET {{baseUrl}}/orders?offset=-1
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 9. Get Orders - No Token ---- 401
+GET {{baseUrl}}/orders
+
+###
+
+### 10. Get Orders - Admin Role ---- 403
+GET {{baseUrl}}/orders
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ============================================
+### CLIENT - GET ORDER BY ID
+### ============================================
+
+### 1. Get Order By ID - Success ---- 200
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 2. Get Order By ID - No Token ---- 401
+GET {{baseUrl}}/orders/{{orderId}}
+
+###
+
+### 3. Get Order By ID - Admin Role ---- 403
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 4. Get Order By ID - Order Not Found ---- 400
+GET {{baseUrl}}/orders/{{invalidOrderId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 5. Get Order By ID - Order Belongs To Another User ---- 404
+GET {{baseUrl}}/orders/{{otherUserOrderId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### ============================================
+### ADMIN - GET ALL ORDERS
+### ============================================
+
+### 1. Get All Orders - Success ---- 200
+GET {{baseUrl}}/admin/orders
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 2. Get All Orders - limit ---- 200
+GET {{baseUrl}}/admin/orders?limit=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 3. Get All Orders - offset ---- 200
+GET {{baseUrl}}/admin/orders?offset=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 4. Get All Orders - limit & offset ---- 200
+GET {{baseUrl}}/admin/orders?limit=5&offset=5
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 5. Get All Orders - limit > 100 ---- 400
+GET {{baseUrl}}/admin/orders?limit=101
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 6. Get All Orders - limit = 0 ---- 400
+GET {{baseUrl}}/admin/orders?limit=0
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 7. Get All Orders - Negative offset ---- 400
+GET {{baseUrl}}/admin/orders?offset=-1
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 8. Get All Orders - No Token ---- 401
+GET {{baseUrl}}/admin/orders
+
+###
+
+### 9. Get All Orders - Client Access ---- 403
+GET {{baseUrl}}/admin/orders
+Authorization: Bearer {{clientToken}}
+
+###
+
+### ============================================
+### ADMIN - GET ORDER BY ID
+### ============================================
+
+### 1. Get Order By ID - Success ---- 200
+GET {{baseUrl}}/admin/orders/{{orderId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 2. Get Order By ID - Admin Views Another User's Order ---- 200
+GET {{baseUrl}}/admin/orders/{{otherUserOrderId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 3. Get Order By ID - Order Not Found ---- 404
+GET {{baseUrl}}/admin/orders/{{invalidOrderId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 4. Get Order By ID - No Token ---- 401
+GET {{baseUrl}}/admin/orders/{{orderId}}
+
+###
+
+### 5. Get Order By ID - Client Access ---- 403
+GET {{baseUrl}}/admin/orders/{{orderId}}
+Authorization: Bearer {{clientToken}}
+
+###

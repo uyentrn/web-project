@@ -16,7 +16,9 @@ class CartService {
     return this.prisma.$transaction(async (tx) => {
       const variant = await tx.productVariant.findUnique({ where: { id: variantId } });
       if (!variant) throw notFound('Product variant');
-      const cart = await tx.cart.upsert({ where: { userId }, create: { userId }, update: {} });
+      // const cart = await tx.cart.upsert({ where: { userId }, create: { userId }, update: {} });
+      const cart = await tx.cart.findUnique({ where: { userId } });
+      if (!cart) { throw new Error('Cart not found.'); }
       const existing = await tx.cartItem.findUnique({ where: { cartId_variantId: { cartId: cart.id, variantId } } });
       const nextQuantity = quantity + (existing?.quantity || 0);
       if (variant.stock < nextQuantity) throw invalid('Requested quantity exceeds available stock.');

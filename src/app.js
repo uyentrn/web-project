@@ -34,7 +34,7 @@ function createApp({ controllers, tokenIssuer, logger } = {}) {
   app.use('/api/cart', createCartRouter(controllers.cart, { authenticate, requireClient }));
   //app.use('/api/wishlist', createWishlistRouter(controllers.wishlist, { authenticate, requireClient }));
   app.use('/api/orders', createOrderRouter(controllers.order, { authenticate, requireClient }));
-  app.use('/api/admin/orders', createAdminOrderRouter(controllers.order, {authenticate, requireAdmin,}));
+  app.use('/api/admin/orders', createAdminOrderRouter(controllers.adminOrder, {authenticate, requireAdmin,}));
   app.use('/api/payments', createPaymentRouter(controllers.payment, { authenticate, requireClient }));
   app.use('/api', createReviewRouter(controllers.review, { authenticate, requireClient }));
   app.use(notFoundHandler);

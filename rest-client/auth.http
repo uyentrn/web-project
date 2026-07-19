@@ -16,9 +16,9 @@ POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "newuser@gmail.com",
+  "email": "newclient@gmail.com",
   "password": "Password123",
-  "name": "New User"
+  "name": "NEW CLIENT"
 }
 
 ###
@@ -75,8 +75,10 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "alice@gmail.com",
-  "password": "123456"
+  # "email": "alice@gmail.com",
+  # "password": "123456"
+  "email": "newclient@gmail.com",
+  "password": "Password123"
 }
 ###
 # admin

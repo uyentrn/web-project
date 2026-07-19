@@ -32,7 +32,7 @@ model User {
   email        String    @unique
   passwordHash String
   name         String?
-  carts        Cart[]
+  cart         Cart?
   orders       Order[]
   reviews      Review[]
   sessions     Session[]

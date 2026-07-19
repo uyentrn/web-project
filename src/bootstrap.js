@@ -12,6 +12,7 @@ const createAuthController = require('./controllers/auth.controller');
 const createCartController = require('./controllers/cart.controller');
 const createCategoryController = require('./controllers/category.controller');
 const createOrderController = require('./controllers/order.controller');
+const createAdminOrderController = require('./controllers/admin.order.controller');
 const createProductController = require('./controllers/product.controller');
 const createReviewController = require('./controllers/review.controller');
 
@@ -50,6 +51,7 @@ function createApplication() {
     hash: (password) => bcrypt.hash(password, Number(process.env.BCRYPT_ROUNDS || 12)),
     compare: (password, passwordHash) => bcrypt.compare(password, passwordHash),
   };
+  const orderService = new OrderService(database);
 
   return createApp({
     tokenIssuer,
@@ -57,7 +59,8 @@ function createApplication() {
       auth: createAuthController(new AuthService(database, { passwordHasher, tokenIssuer, accessTtlMs, refreshTtlMs })),
       cart: createCartController(new CartService(database)),
       category: createCategoryController(new CategoryService(database)),
-      order: createOrderController(new OrderService(database)),
+      order: createOrderController(orderService),
+      adminOrder: createAdminOrderController(orderService),
       product: createProductController(new ProductService(database)),
       review: createReviewController(new ReviewService(database)),
       user: unavailableController(['getProfile', 'updateProfile']),

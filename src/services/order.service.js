@@ -54,6 +54,51 @@ class OrderService {
     if (!order) throw notFound('Order');
     return order;
   }
+
+  async listAll({ limit = 20, offset = 0 } = {}) {
+    const take = positiveInteger(limit, 'Limit');
+    const skip = nonNegativeInteger(offset, 'Offset');
+
+    if (take > 100) {
+      throw invalid('Limit cannot exceed 100.');
+    }
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        include: orderInclude,
+        take,
+        skip,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prisma.order.count(),
+    ]);
+
+    return {
+      data,
+      total,
+      limit: take,
+      offset: skip,
+    };
+  }
+
+  async getById(orderId) {
+    requireId(orderId, 'Order');
+
+    const order = await this.prisma.order.findUnique({
+      where: {
+        id: orderId,
+      },
+      include: orderInclude,
+    });
+
+    if (!order) {
+      throw notFound('Order');
+    }
+
+    return order;
+  }
 }
 
 function cents(price) {

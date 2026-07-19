@@ -1,4 +1,5 @@
 const { AppError, invalid } = require('../services/errors');
+const { validate: isUUID } = require('uuid');
 
 function body(req) {
   if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
@@ -36,7 +37,12 @@ function optionalPositiveInteger(value, field) {
 }
 
 function id(value, field = 'ID') {
-  return requiredString(value, field);
+  //return requiredString(value, field);
+  const result = requiredString(value, field);
+  if (!isUUID(result)) {
+    throw invalid(`${field} must be a valid UUID.`);
+  }
+  return result;
 }
 
 function authenticatedUser(req, { sessionRequired = false } = {}) {
