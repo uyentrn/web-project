@@ -21,7 +21,12 @@ class AuthService {
 
     try {
       const user = await this.prisma.user.create({
-        data: { email: normalizedEmail, passwordHash: await this.passwordHasher.hash(password), name: normalizeOptionalText(name, 'Name') },
+        data: { 
+          email: normalizedEmail, 
+          passwordHash: await this.passwordHasher.hash(password), 
+          name: normalizeOptionalText(name, 'Name'),
+          role:"CLIENT" 
+        },
       });
       return this.#createSessionTokens(user);
     } catch (error) {
@@ -72,7 +77,7 @@ class AuthService {
     await this.prisma.session.create({ data: { id: sessionId, userId: user.id, tokenHash: hashToken(refreshToken), expiresAt } });
     return {
       user: { id: user.id, email: user.email, name: user.name },
-      accessToken: await this.tokenIssuer.signAccess({ sub: user.id, sid: sessionId }, this.accessTtlMs),
+      accessToken: await this.tokenIssuer.signAccess({ sub: user.id, sid: sessionId, role: user.role }, this.accessTtlMs),
       refreshToken,
     };
   }

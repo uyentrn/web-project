@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CLIENT
+  ADMIN
+}
+
 enum OrderStatus {
   pending
   paid
@@ -23,6 +28,7 @@ enum ScentLayer {
 
 model User {
   id           String    @id @default(uuid()) @db.Uuid
+  role         UserRole  @default(CLIENT)
   email        String    @unique
   passwordHash String
   name         String?
@@ -58,6 +64,7 @@ model Product {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
+  @@unique([name, brand])
   @@index([name])
   @@index([brand])
   @@index([categoryId])

@@ -1,0 +1,293 @@
+### ============================================
+### Base Configuration
+### ============================================
+
+@baseUrl = http://localhost:3000/api
+
+@productId = 22b1678e-1b54-4463-91b5-24ea8d6d8bb5
+@invalidProductId = 00000000-0000-0000-0000-000000000000
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNWQ2YTdiNi1lODljLTQxZTEtOWRjYS05NzQwNDBjNGM1N2QiLCJzaWQiOiJlMGM2YTk1Yi1iOGJiLTQ0OGItYTJhOC1hMTM0ZTJjYjg1M2MiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODQzOTQ4NjMsImV4cCI6MTc4NDM5NTc2MywiYXVkIjoicGVyZnVtZS1lY29tbWVyY2UtY2xpZW50IiwiaXNzIjoicGVyZnVtZS1lY29tbWVyY2UtYXBpIn0.ac7d94NhFZ8R2KUtOmcyXpPPpqyeRDeaYlOUEnr51iM
+@clientAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ZmQ1NmQ5Ny05YzhlLTQ2ZGUtYWEwZi1jZDAwZmJlYzAxOWYiLCJzaWQiOiIxMDYzM2ZhNy05OTQxLTQyM2QtYTM3Yy01NWFkMzQ3OTNhOTQiLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzg0Mzk0ODQzLCJleHAiOjE3ODQzOTU3NDMsImF1ZCI6InBlcmZ1bWUtZWNvbW1lcmNlLWNsaWVudCIsImlzcyI6InBlcmZ1bWUtZWNvbW1lcmNlLWFwaSJ9._e2FnZcktXUBAOBDMznX4_HEdAxMzTlqOzzfm1ERqh8
+
+### ============================================
+### PRODUCTS - GET PRODUCTS
+### ============================================
+
+### 1. Get Products - Default --- ok 200
+GET {{baseUrl}}/products
+
+###
+
+### 2. Get Products - With Pagination --- ok 200
+GET {{baseUrl}}/products?limit=10&offset=0
+
+###
+
+### 3. Get Products - Filter By Category --- ok 200
+GET {{baseUrl}}/products?category=Men
+
+###
+
+### 4. Get Products - Filter By Minimum Price --- ok 200
+GET {{baseUrl}}/products?min_price=500000
+
+###
+
+### 5. Get Products - Multiple Filters --- ok 200
+GET {{baseUrl}}/products?limit=5&offset=0&category=Men&min_price=500000
+
+###
+
+### ============================================
+### PRODUCTS - GET PRODUCT DETAIL
+### ============================================
+
+### 6. Get Product Detail - Success --- ok 200
+GET {{baseUrl}}/products/{{productId}}
+
+###
+
+### 7. Get Product Detail - Product Not Found --- ok 404
+GET {{baseUrl}}/products/{{invalidProductId}}
+
+###
+
+### ============================================
+### PRODUCTS - SEARCH
+### ============================================
+
+### 8. Search Products - Success --- ok 200
+GET {{baseUrl}}/search?q=dior
+
+###
+
+### 9. Search Products - Another Keyword --- ok 200
+GET {{baseUrl}}/search?q=chanel
+
+###
+
+### 10. Search Products - No Result --- ok 200
+GET {{baseUrl}}/search?q=thisproductdoesnotexist
+
+###
+
+### 11. Search Products - Empty Keyword --- ok 400
+GET {{baseUrl}}/search?q=
+
+###
+
+### 12. Search Products - Pagination --- ok 200
+GET {{baseUrl}}/search?q=dior&limit=5&offset=0
+
+###
+
+### ============================================
+### CATEGORIES
+### ============================================
+
+### 13. Get Categories - Success --- ok 200
+GET {{baseUrl}}/categories
+
+###
+
+
+### ============================================
+### PRODUCTS - CREATE PRODUCT
+### ============================================
+
+### 14. Create Product - Success --- ok 201
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Office Perfume",
+  "brand": "Office Brand",
+  "categoryId": "b5123a45-7a0d-443b-be92-d6bd1e34ccc1",
+  "description": "Warm spicy fragrance.",
+  "imageUrl": "https://example.com/noir-extreme.jpg"
+}
+
+###
+
+### 15. Create Product - Missing Token --- ok 401
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Tom Ford Noir Extreme",
+  "brand": "Tom Ford",
+  "category": "Men",
+  "description": "Warm spicy fragrance.",
+  "imageUrl": "https://example.com/noir-extreme.jpg"
+}
+
+###
+
+### 16. Create Product - Invalid Token --- ok 401
+POST {{baseUrl}}/products
+Authorization: Bearer invalid-token
+Content-Type: application/json
+
+{
+  "name": "Tom Ford Noir Extreme",
+  "brand": "Tom Ford",
+  "category": "Men",
+  "description": "Warm spicy fragrance.",
+  "imageUrl": "https://example.com/noir-extreme.jpg"
+}
+
+###
+
+### 17. Create Product - Non Admin User --- ok 403
+POST {{baseUrl}}/products
+Authorization: Bearer {{clientAccessToken}}
+Content-Type: application/json
+
+{
+  "name": "Tom Ford Noir Extreme",
+  "brand": "Tom Ford",
+  "category": "Men",
+  "description": "Warm spicy fragrance.",
+  "imageUrl": "https://example.com/noir-extreme.jpg"
+}
+
+###
+
+### 18. Create Product - Duplicate Product --- ok 409
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Tom Ford Noir Extreme",
+  "brand": "Tom Ford",
+  "categoryId": "fc9c6a41-f852-44cd-8e74-83788276b565",
+  "description": "Warm spicy fragrance.",
+  "imageUrl": "https://example.com/noir-extreme.jpg"
+}
+
+###
+
+### 19. Create Product - Missing Name --- ok 400
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "brand": "Tom Ford",
+  "category": "Men",
+  "description": "Warm spicy fragrance.",
+  "imageUrl": "https://example.com/noir-extreme.jpg"
+}
+
+###
+
+### 20. Create Product - Empty Body --- ok 400
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### ============================================
+### PRODUCTS - UPDATE PRODUCT
+### ============================================
+
+### 21. Update Product - Success --- ok 200
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "Updated description"
+}
+
+###
+
+### 22. Update Product - Missing Token --- ok 401
+PUT {{baseUrl}}/products/{{productId}}
+Content-Type: application/json
+
+{
+  "description": "Updated description"
+}
+
+###
+
+### 23. Update Product - Invalid Token --- ok 401
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer invalid-token
+Content-Type: application/json
+
+{
+  "description": "Updated description"
+}
+
+###
+
+### 24. Update Product - Non Admin User --- ok 403
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{clientAccessToken}}
+Content-Type: application/json
+
+{
+  "description": "Updated description"
+}
+
+###
+
+### 25. Update Product - Product Not Found --- ok 404
+PUT {{baseUrl}}/products/{{invalidProductId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "description": "Updated description"
+}
+
+###
+
+### 26. Update Product - Invalid Body --- ok 400
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### ============================================
+### PRODUCTS - DELETE PRODUCT
+### ============================================
+
+### 27. Delete Product - Success --- ok 200
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 28. Delete Product - Missing Token --- ok 401
+DELETE {{baseUrl}}/products/{{productId}}
+
+###
+
+### 29. Delete Product - Invalid Token --- ok 401
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer invalid-token
+
+###
+
+### 30. Delete Product - Non Admin User --- ok 403
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{clientAccessToken}}
+
+###
+
+### 31. Delete Product - Product Not Found --- ok 404
+DELETE {{baseUrl}}/products/{{invalidProductId}}
+Authorization: Bearer {{accessToken}}
+
+###

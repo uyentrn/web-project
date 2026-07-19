@@ -1,0 +1,62 @@
+### --- AUTHENTICATION ---
+# Thay thế bằng route đăng nhập thực tế của bạn
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "customer@example.com",
+  "password": "your_password"
+}
+
+### --- PRODUCT API ---
+# Lấy danh sách toàn bộ sản phẩm
+GET http://localhost:3000/api/products
+
+###
+# Lấy chi tiết một sản phẩm (Thay ID bằng 1 ID thật từ kết quả GET trên)
+GET http://localhost:3000/api/products/{{product_id}}
+
+
+### --- CART API ---
+# Xem giỏ hàng
+GET http://localhost:3000/api/cart
+Authorization: Bearer <YOUR_TOKEN_HERE>
+
+###
+# Thêm sản phẩm vào giỏ
+POST http://localhost:3000/api/cart
+Content-Type: application/json
+Authorization: Bearer <YOUR_TOKEN_HERE>
+
+{
+  "variantId": "YOUR_VARIANT_ID_HERE",
+  "quantity": 1
+}
+
+
+### --- ORDER API ---
+# Tạo đơn hàng từ giỏ hàng
+POST http://localhost:3000/api/orders
+Content-Type: application/json
+Authorization: Bearer <YOUR_TOKEN_HERE>
+
+{
+  "shippingAddress": "123 Đường ABC, Quận 1, TP.HCM"
+}
+
+###
+# Xem lịch sử đơn hàng
+GET http://localhost:3000/api/orders
+Authorization: Bearer <YOUR_TOKEN_HERE>
+
+
+### --- REVIEW API ---
+# Gửi đánh giá cho sản phẩm
+POST http://localhost:3000/api/products/{{product_id}}/reviews
+Content-Type: application/json
+Authorization: Bearer <YOUR_TOKEN_HERE>
+
+{
+  "rating": 5,
+  "comment": "Sản phẩm rất thơm và đóng gói cẩn thận!"
+}

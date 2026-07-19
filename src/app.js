@@ -8,6 +8,7 @@ const createSearchRouter = require('./routes/search.route');
 const createCartRouter = require('./routes/cart.route');
 const createWishlistRouter = require('./routes/wishlist.route');
 const createOrderRouter = require('./routes/order.route');
+const createAdminOrderRouter = require('./routes/admin.order.route');
 const createPaymentRouter = require('./routes/payment.route');
 const createReviewRouter = require('./routes/review.route');
 const createAuthMiddleware = require('./middlewares/auth.middleware');
@@ -19,7 +20,8 @@ function createApp({ controllers, tokenIssuer, logger } = {}) {
   if (!controllers) throw new Error('App requires controllers.');
   const app = express();
   const authenticate = createAuthMiddleware({ tokenIssuer });
-  const requireAdmin = requireRole('admin');
+  const requireAdmin = requireRole('ADMIN');
+  const requireClient = requireRole('CLIENT');
 
   app.use(createLoggerMiddleware(logger));
   app.use(express.json());
@@ -29,11 +31,12 @@ function createApp({ controllers, tokenIssuer, logger } = {}) {
   app.use('/api/categories', createCategoryRouter(controllers.category, { authenticate, requireAdmin }));
   app.use('/api/products', createProductRouter(controllers.product, { authenticate, requireAdmin }));
   app.use('/api/search', createSearchRouter(controllers.product));
-  app.use('/api/cart', createCartRouter(controllers.cart, { authenticate }));
-  app.use('/api/wishlist', createWishlistRouter(controllers.wishlist, { authenticate }));
-  app.use('/api/orders', createOrderRouter(controllers.order, { authenticate }));
-  app.use('/api/payments', createPaymentRouter(controllers.payment, { authenticate }));
-  app.use('/api', createReviewRouter(controllers.review, { authenticate }));
+  app.use('/api/cart', createCartRouter(controllers.cart, { authenticate, requireClient }));
+  //app.use('/api/wishlist', createWishlistRouter(controllers.wishlist, { authenticate, requireClient }));
+  app.use('/api/orders', createOrderRouter(controllers.order, { authenticate, requireClient }));
+  app.use('/api/admin/orders', createAdminOrderRouter(controllers.order, {authenticate, requireAdmin,}));
+  app.use('/api/payments', createPaymentRouter(controllers.payment, { authenticate, requireClient }));
+  app.use('/api', createReviewRouter(controllers.review, { authenticate, requireClient }));
   app.use(notFoundHandler);
   app.use(errorHandler);
 

@@ -48,7 +48,13 @@ class ProductService {
   }
 
   async #writeProduct(input, id) {
-    const data = productData(input);
+    const partial = !!id;
+    const data = productData(input, { partial });
+    
+    if (partial && Object.keys(data).length === 0) {
+      throw invalid('Request body cannot be empty.');
+    }
+
     try {
       if (id) return await this.prisma.product.update({ where: { id }, data, include: productInclude });
       return await this.prisma.product.create({ data, include: productInclude });
@@ -56,12 +62,28 @@ class ProductService {
   }
 }
 
-function productData(input) {
-  if (!input || typeof input !== 'object') throw invalid('Product data is required.');
-  const data = {
-    name: text(input.name, 'Name'), brand: text(input.brand, 'Brand'), description: text(input.description, 'Description'),
-    imageUrl: text(input.imageUrl, 'Image URL'), categoryId: text(input.categoryId, 'Category ID'),
-  };
+function productData(input, { partial = false } = {}) {
+  const data = {};
+
+  if (!partial || input.name !== undefined) {
+    data.name = text(input.name, 'Name');
+  }
+
+  if (!partial || input.brand !== undefined) {
+    data.brand = text(input.brand, 'Brand');
+  }
+
+  if (!partial || input.description !== undefined) {
+    data.description = text(input.description, 'Description');
+  }
+
+  if (!partial || input.imageUrl !== undefined) {
+    data.imageUrl = text(input.imageUrl, 'Image URL');
+  }
+
+  if (!partial || input.categoryId !== undefined) {
+    data.categoryId = text(input.categoryId, 'Category ID');
+  }
   if (input.variants !== undefined) data.variants = { deleteMany: {}, create: variants(input.variants) };
   if (input.notes !== undefined) data.notes = { deleteMany: {}, create: notes(input.notes) };
   return data;

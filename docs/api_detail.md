@@ -27,7 +27,7 @@ Content-Type: application/json
 **Outputs:**
 
 #### 201 Created (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -39,10 +39,18 @@ Content-Type: application/json
 ```
 
 #### 400 Bad Request (Error): 
-```
+```json
 { 
   "status": "error", 
-  "message": "Email already exists or invalid input" 
+  "message": "Invalid input" 
+}
+```
+
+#### 409 Conflicts (Error): 
+```json
+{ 
+  "status": "error", 
+  "message": "An account with this email already exists." 
 }
 ```
 
@@ -60,10 +68,15 @@ Content-Type: application/json
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
+    "user": {
+      "id": "...",
+      "email": "...",
+      "name": "..."
+    },
     "accessToken": "jwt_access_token",
     "refreshToken": "jwt_refresh_token" 
   } 
@@ -71,10 +84,10 @@ Content-Type: application/json
 ```
 #### 401 Unauthorized (Error): 
 
-```
+```json
 { 
   "status": "error", 
-  "message": "Invalid credentials" 
+  "message": "Invalid email or password." 
 }
 ```
 
@@ -91,7 +104,7 @@ Content-Type: application/json
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -101,7 +114,7 @@ Content-Type: application/json
 ```
 
 #### 401 Unauthorized (Error): 
-``` 
+``` json
 { 
   "status": "error", 
   "message": "Refresh token expired or invalid" 
@@ -117,7 +130,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "message": "Logged out successfully" 
@@ -125,7 +138,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Missing or invalid token" 
@@ -143,7 +156,7 @@ GET {{baseUrl}}/api/products?limit=10&offset=0&category=nam&min_price=500000
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": [{ 
@@ -162,7 +175,7 @@ GET {{baseUrl}}/api/products/uuid-cua-san-pham
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -173,7 +186,7 @@ GET {{baseUrl}}/api/products/uuid-cua-san-pham
 }
 ```
 #### 404 Not Found (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Product not found" 
@@ -188,7 +201,7 @@ GET {{baseUrl}}/api/search?q=chanel&limit=10&offset=0
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": [{ 
@@ -206,13 +219,170 @@ GET {{baseUrl}}/api/categories
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": [{ 
     "id": "uuid", 
     "name": "Hương gỗ" 
   }] 
+}
+```
+
+### 2.5. Tạo sản phẩm (Create Product)
+**Input:**
+```http
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Dior Sauvage Elixir",
+  "brand": "Dior",
+  "category": "Men",
+  "description": "A rich and intense fragrance.",
+  "imageUrl": "https://example.com/image.jpg"
+}
+```
+
+**Outputs:**
+#### 201 Created (Success): 
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "uuid",
+    "name": "Dior Sauvage Elixir",
+    "brand": "Dior"
+  }
+}
+```
+
+#### 400 Bad Request (Error):
+```json
+{
+  "status": "error",
+  "message": "Invalid input"
+}
+```
+
+#### 401 Unauthorized (Error):
+```json
+{
+  "status": "error",
+  "message": "Unauthorized"
+}
+```
+
+#### 403 Forbidden (Error):
+```json
+{
+  "status": "error",
+  "message": "Admin permission required"
+}
+```
+
+#### 409 Conflict (Error):
+```json
+{
+  "status": "error",
+  "message": "Product already exists"
+}
+```
+
+### 2.6. Cập nhật sản phẩm (Update Product)
+**Input:**
+```http
+PUT {{baseUrl}}/api/products/uuid-cua-san-pham
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Dior Sauvage EDT",
+  "brand": "Dior",
+  "description": "Updated description"
+}
+```
+**Outputs:**
+#### 200 OK (Success):
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "uuid",
+    "name": "Dior Sauvage EDT"
+  }
+}
+```
+
+#### 400 Bad Request (Error):
+```json
+{
+  "status": "error",
+  "message": "Invalid input"
+}
+```
+
+#### 401 Unauthorized (Error):
+```json
+{
+  "status": "error",
+  "message": "Unauthorized"
+}
+```
+
+#### 403 Forbidden (Error):
+```json
+{
+  "status": "error",
+  "message": "Admin permission required"
+}
+```
+
+#### 404 Not Found (Error):
+```json
+{
+  "status": "error",
+  "message": "Product not found"
+}
+```
+
+### 2.7. Xóa sản phẩm (Delete Product)
+**Input:**
+```http
+DELETE {{baseUrl}}/api/products/uuid-cua-san-pham
+Authorization: Bearer {{token}}
+```
+
+**Outputs:**
+#### 200 OK (Success):
+```json
+{
+  "status": "success",
+  "message": "Product deleted successfully"
+}
+```
+#### 401 Unauthorized (Error):
+```json
+{
+  "status": "error",
+  "message": "Unauthorized"
+}
+```
+
+#### 403 Forbidden (Error):
+```json
+{
+  "status": "error",
+  "message": "Admin permission required"
+}
+```
+
+#### 404 Not Found (Error):
+```json
+{
+  "status": "error",
+  "message": "Product not found"
 }
 ```
 ---
@@ -228,7 +398,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -238,7 +408,7 @@ Authorization: Bearer {{token}}
 }
 ```
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -260,7 +430,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 201 Created (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": {
@@ -271,7 +441,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 400 Bad Request (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Quantity exceeds stock" 
@@ -279,7 +449,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -300,7 +470,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -311,7 +481,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 400 Bad Request (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Invalid quantity" 
@@ -319,7 +489,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -327,7 +497,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 404 Not Found (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Item not found in cart" 
@@ -343,7 +513,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "message": "Item removed from cart" 
@@ -351,7 +521,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -359,7 +529,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 404 Not Found (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Item not found" 
@@ -380,7 +550,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 201 Created (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -392,7 +562,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 400 Bad Request (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Cart is empty or items out of stock" 
@@ -400,7 +570,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -416,7 +586,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": [{ 
@@ -428,7 +598,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -444,7 +614,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -456,7 +626,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -464,7 +634,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 404 Not Found (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Order not found" 
@@ -490,7 +660,7 @@ Authorization: Bearer {{token}}
 
 **Outputs:**
 #### 201 Created (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": { 
@@ -501,7 +671,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 400 Bad Request (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Only verified purchasers can review this product" 
@@ -509,7 +679,7 @@ Authorization: Bearer {{token}}
 ```
 
 #### 401 Unauthorized (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Unauthorized" 
@@ -524,7 +694,7 @@ GET {{baseUrl}}/api/products/uuid-cua-san-pham/reviews
 
 **Outputs:**
 #### 200 OK (Success): 
-```
+```json
 { 
   "status": "success", 
   "data": [{ 
@@ -536,7 +706,7 @@ GET {{baseUrl}}/api/products/uuid-cua-san-pham/reviews
 ```
 
 #### 404 Not Found (Error): 
-```
+```json
 { 
   "status": "error", 
   "message": "Product not found" 

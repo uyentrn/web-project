@@ -1,0 +1,175 @@
+### ============================================
+### Base Configuration
+### ============================================
+
+@baseUrl = http://localhost:3000/api
+
+@accessToken =
+@refreshToken =
+
+### ============================================
+### AUTH - REGISTER
+### ============================================
+
+### 1. Register - Success ---- ok 201
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@gmail.com",
+  "password": "Password123",
+  "name": "New User"
+}
+
+###
+
+### 2. Register - Duplicate Email --- ok 409
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@gmail.com",
+  "password": "Password123",
+  "name": "Alice"
+}
+
+###
+
+### 3. Register - Missing Email --- ok 400
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "password": "Password123",
+  "name": "User"
+}
+
+###
+
+### 4. Register - Missing Password --- ok 400
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "abc@gmail.com",
+  "name": "User"
+}
+
+###
+
+### 5. Register - Empty Body --- ok 400
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{}
+
+###
+
+### ============================================
+### AUTH - LOGIN
+### ============================================
+
+### 6. Login - Success --- ok 200
+# client
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@gmail.com",
+  "password": "123456"
+}
+###
+# admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newuser@gmail.com",
+  "password": "Password123"
+}
+###
+
+### 7. Login - Wrong Password --- ok 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@gmail.com",
+  "password": "wrongpassword"
+}
+
+###
+
+### 8. Login - User Not Found --- ok 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "notfound@gmail.com",
+  "password": "123456"
+}
+
+###
+
+### 9. Login - Missing Password --- ok 400
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@gmail.com"
+}
+
+###
+
+### ============================================
+### AUTH - REFRESH TOKEN
+### ============================================
+
+### 10. Refresh Token - Success   --- ok 200
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+### 11. Refresh Token - Invalid Token --- ok 401
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "invalid-refresh-token"
+}
+
+###
+
+### 12. Refresh Token - Empty Body  --- ok 400
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{}
+
+###
+
+### ============================================
+### AUTH - LOGOUT
+### ============================================
+
+### 13. Logout - Success
+POST {{baseUrl}}/auth/logout  --- ok 200
+Authorization: Bearer {{accessToken}}
+
+###
+
+### 14. Logout - Missing Token  --- ok 401
+POST {{baseUrl}}/auth/logout
+
+###
+
+### 15. Logout - Invalid Token  --- ok 401
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer invalid-token
+
+###

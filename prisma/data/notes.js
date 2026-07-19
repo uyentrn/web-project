@@ -1,0 +1,51 @@
+module.exports = [
+  { name: 'Bergamot' },
+  { name: 'Lemon' },
+  { name: 'Orange' },
+  { name: 'Mandarin' },
+  { name: 'Grapefruit' },
+
+  { name: 'Lavender' },
+  { name: 'Rose' },
+  { name: 'Jasmine' },
+  { name: 'Lily' },
+  { name: 'Violet' },
+
+  { name: 'Vanilla' },
+  { name: 'Amber' },
+  { name: 'Musk' },
+  { name: 'Sandalwood' },
+  { name: 'Cedarwood' },
+
+  { name: 'Vetiver' },
+  { name: 'Patchouli' },
+  { name: 'Tonka Bean' },
+  { name: 'Leather' },
+  { name: 'Oud' },
+
+  { name: 'Pink Pepper' },
+  { name: 'Black Pepper' },
+  { name: 'Cardamom' },
+  { name: 'Nutmeg' },
+  { name: 'Cinnamon' },
+
+  { name: 'Apple' },
+  { name: 'Pear' },
+  { name: 'Pineapple' },
+  { name: 'Blackcurrant' },
+  { name: 'Coconut' },
+
+  { name: 'Incense' },
+  { name: 'Iris' },
+  { name: 'Ylang-Ylang' },
+  { name: 'Peony' },
+  { name: 'Magnolia' },
+  { name: 'Tobacco' },
+  { name: 'Coffee' },
+  { name: 'Chocolate' },
+  { name: 'Sea Salt' },
+  { name: 'Green Tea' },
+
+  { name: 'Saffron' },
+  { name: 'Birch' },
+];

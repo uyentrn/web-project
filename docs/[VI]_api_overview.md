@@ -33,6 +33,12 @@ Module cốt lõi để khám phá và lọc sản phẩm. Được thiết kế
 | GET | `/api/orders` | Xem lịch sử đơn hàng của người dùng | Yes |
 | GET | `/api/orders/{id}` | Xem chi tiết hoặc trạng thái đơn hàng cụ thể | Yes |
 
+**api dành cho admin:**
+| Method | Endpoint | Mô tả | Auth Required |
+| :--- | :--- | :--- | :--- |
+| GET |`/api/admin/orders`| Xem lịch sử đơn hàng của tất cả người dùng | Yes |
+| GET | `/api/admin/orders/:id` | Xem chi tiết hoặc trạng thái đơn hàng cụ thể | Yes |
+
 ## 4. Module Reviews (Đánh giá)
 Hệ thống phản hồi từ người dùng. Chỉ áp dụng cho người dùng đã xác thực là người mua hàng.
 
