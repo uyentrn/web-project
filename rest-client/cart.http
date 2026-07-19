@@ -1,0 +1,332 @@
+### ============================================
+### Base Configuration
+### ============================================
+
+@baseUrl = http://localhost:3000/api
+
+@accessToken =
+@clientToken = 
+@adminToken = 
+
+@invalidToken = invalid-token
+
+### Replace after seeding
+@variantId = 
+@invalidVariantId = 
+
+### Replace after Add Item Success
+@cartItemId = 
+@invalidCartItemId = 
+
+### ============================================
+### GET CART
+### ============================================
+
+### 1. Get Cart - Success ---- 200
+GET {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 2. Get Cart - No Token ---- 401
+GET {{baseUrl}}/cart
+
+###
+
+### 3. Get Cart - Admin Role ---- 403
+GET {{baseUrl}}/cart
+Authorization: Bearer {{adminToken}}
+
+###
+
+### ============================================
+### ADD ITEM
+### ============================================
+
+### 1. Add Item - Success ---- 201
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 1
+}
+
+###
+
+### 2. Add Same Variant Again (Quantity should increase) ---- 201
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 2
+}
+
+###
+
+### 3. Add Item - No Token ---- 401
+POST {{baseUrl}}/cart
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 1
+}
+
+###
+
+### 4. Add Item - Admin Role ---- 403
+POST {{baseUrl}}/cart
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 1
+}
+
+###
+
+### 5. Add Item - Empty Body ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### 6. Add Item - Missing variant_id ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": 1
+}
+
+###
+
+### 7. Add Item - Missing quantity ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}"
+}
+
+###
+
+### 8. Add Item - Quantity = 0 ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 0
+}
+
+###
+
+### 9. Add Item - Quantity < 0 ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": -1
+}
+
+###
+
+### 10. Add Item - Quantity Float ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 1.5
+}
+
+###
+
+### 11. Add Item - Quantity String ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": "abc"
+}
+
+###
+
+### 12. Add Item - Variant Not Found ---- 404
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{invalidVariantId}}",
+  "quantity": 1
+}
+
+###
+
+### 13. Add Item - Quantity Exceeds Stock ---- 400
+POST {{baseUrl}}/cart
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "variant_id": "{{variantId}}",
+  "quantity": 99999
+}
+
+###
+
+### ============================================
+### UPDATE ITEM
+### ============================================
+
+### 1. Update Item - Success ---- 200
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": 10
+}
+
+###
+
+### 2. Update Item - No Token ---- 401
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+###
+
+### 3. Update Item - Admin Role ---- 403
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+###
+
+### 4. Update Item - Cart Item Not Found ---- 404
+PUT {{baseUrl}}/cart/{{invalidCartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+###
+
+### 5. Update Item - Missing Quantity ---- 400
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### 6. Update Item - Quantity = 0 ---- 400
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": 0
+}
+
+###
+
+### 7. Update Item - Quantity Negative ---- 400
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": -2
+}
+
+###
+
+### 8. Update Item - Quantity Float ---- 400
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": 2.5
+}
+
+###
+
+### 9. Update Item - Quantity String ---- 400
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": "abc"
+}
+
+###
+
+### 10. Update Item - Quantity Exceeds Stock ---- 400
+PUT {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "quantity": 99999
+}
+
+###
+
+### ============================================
+### DELETE ITEM
+### ============================================
+
+### 1. Delete Item - Success ---- 200
+DELETE {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 2. Delete Item - No Token ---- 401
+DELETE {{baseUrl}}/cart/{{cartItemId}}
+
+###
+
+### 3. Delete Item - Admin Role ---- 403
+DELETE {{baseUrl}}/cart/{{cartItemId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 4. Delete Item - Not Found ---- 404
+DELETE {{baseUrl}}/cart/{{invalidCartItemId}}
+Authorization: Bearer {{clientToken}}
+
+###
