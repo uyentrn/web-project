@@ -36,7 +36,7 @@ function createApp({ controllers, tokenIssuer, logger } = {}) {
   app.use('/api/orders', createOrderRouter(controllers.order, { authenticate, requireClient }));
   app.use('/api/admin/orders', createAdminOrderRouter(controllers.adminOrder, {authenticate, requireAdmin,}));
   app.use('/api/payments', createPaymentRouter(controllers.payment, { authenticate, requireClient }));
-  app.use('/api', createReviewRouter(controllers.review, { authenticate, requireClient }));
+  app.use('/api', createReviewRouter(controllers.review, { authenticate, requireClient, requireAdmin }));
   app.use(notFoundHandler);
   app.use(errorHandler);
 

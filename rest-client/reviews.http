@@ -1,0 +1,400 @@
+### ============================================
+### Base Configuration
+### ============================================
+
+@baseUrl = http://localhost:3000/api
+
+@clientToken = 
+@adminToken = 
+@otherClientToken = 
+
+@productId = 
+@otherProductId = 
+@notPurchasedProductId = 
+
+@invalidProductId = 
+@reviewId =  
+@otherUserReviewId = 
+@invalidReviewId = 
+
+### ============================================
+### REVIEW - CREATE
+### ============================================
+
+### 1. Create Review - Success ---- 201
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Excellent fragrance, long lasting."
+}
+
+###
+
+### 2. Create Review - Unauthorized ---- 401
+POST {{baseUrl}}/products/{{productId}}/reviews
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Excellent fragrance."
+}
+
+###
+
+### 3. Create Review - Admin Cannot Review ---- 403
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Admin review."
+}
+
+###
+
+### 4. Create Review - Invalid Product UUID ---- 400
+POST {{baseUrl}}/products/invalid-uuid/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Excellent."
+}
+
+###
+
+### 5. Create Review - Product Not Found ---- 404
+POST {{baseUrl}}/products/{{invalidProductId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Excellent."
+}
+
+###
+
+### 6. Create Review - Product Not Purchased ---- 403
+POST {{baseUrl}}/products/{{notPurchasedProductId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "I have never bought this."
+}
+
+###
+
+### 7. Create Review - Duplicate Review ---- 409
+### Run request #1 first
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Duplicate review."
+}
+
+###
+
+### 8. Create Review - Rating = 0 ---- 400
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 0,
+  "comment": "Bad rating."
+}
+
+###
+
+### 9. Create Review - Rating = 6 ---- 400
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 6,
+  "comment": "Too high."
+}
+
+###
+
+### 10. Create Review - Empty Comment ---- 400
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": ""
+}
+
+###
+
+### 11. Create Review - Invalid Body (Array) ---- 400
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+[
+  {
+    "rating": 5
+  }
+]
+
+###
+
+### 12. Create Review - Empty Body ---- 400
+POST {{baseUrl}}/products/{{productId}}/reviews
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### ============================================
+### REVIEW - GET
+### ============================================
+
+### 13. Get Reviews ---- 200
+GET {{baseUrl}}/products/{{productId}}/reviews
+
+###
+
+### 14. Get Reviews - limit=5 offset=0 ---- 200
+GET {{baseUrl}}/products/{{productId}}/reviews?limit=5&offset=0
+
+###
+
+### 15. Get Reviews - limit=2 offset=2 ---- 200
+GET {{baseUrl}}/products/{{productId}}/reviews?limit=2&offset=2
+
+###
+
+### 16. Get Reviews - Invalid Product UUID ---- 400
+GET {{baseUrl}}/products/invalid-uuid/reviews
+
+###
+
+### 17. Get Reviews - Product Not Found ---- 404
+GET {{baseUrl}}/products/{{invalidProductId}}/reviews
+
+###
+
+### 18. Get Reviews - Invalid Limit ---- 400
+GET {{baseUrl}}/products/{{productId}}/reviews?limit=-1
+
+###
+
+### 19. Get Reviews - Limit > 100 ---- 400
+GET {{baseUrl}}/products/{{productId}}/reviews?limit=101
+
+###
+
+### 20. Get Reviews - Invalid Offset ---- 400
+GET {{baseUrl}}/products/{{productId}}/reviews?offset=-1
+
+###
+
+### 21. Get Reviews - Invalid Limit Format ---- 400
+GET {{baseUrl}}/products/{{productId}}/reviews?limit=abc
+
+###
+
+### ============================================
+### REVIEW - UPDATE
+### ============================================
+
+### 22. Update Review - Success ---- 200
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Updated after using it for one month."
+}
+
+###
+
+### 23. Update Review - Only Rating ---- 200
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 3
+}
+
+###
+
+### 24. Update Review - Only Comment ---- 200
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "comment": "Changed my opinion."
+}
+
+###
+
+### 25. Update Review - Unauthorized ---- 401
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Content-Type: application/json
+
+{
+  "rating": 5
+}
+
+###
+
+### 26. Update Review - Other User Review ---- 404
+PUT {{baseUrl}}/reviews/{{otherUserReviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 1
+}
+
+###
+
+### 27. Update Review - Review Not Found ---- 404
+PUT {{baseUrl}}/reviews/{{invalidReviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5
+}
+
+###
+
+### 28. Update Review - Invalid UUID ---- 400
+PUT {{baseUrl}}/reviews/invalid-uuid
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 5
+}
+
+###
+
+### 29. Update Review - Empty Body ---- 400
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{}
+
+###
+
+### 30. Update Review - Rating = 0 ---- 400
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 0
+}
+
+###
+
+### 31. Update Review - Rating = 6 ---- 400
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "rating": 6
+}
+
+###
+
+### 32. Update Review - Empty Comment ---- 400
+PUT {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+Content-Type: application/json
+
+{
+  "comment": ""
+}
+
+###
+
+### ============================================
+### REVIEW - DELETE (CLIENT)
+### ============================================
+
+### 33. Delete Own Review ---- 200
+DELETE {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 34. Delete Other User Review ---- 404
+DELETE {{baseUrl}}/reviews/{{otherUserReviewId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 35. Delete Review - Unauthorized ---- 401
+DELETE {{baseUrl}}/reviews/{{reviewId}}
+
+###
+
+### 36. Delete Review - Invalid UUID ---- 400
+DELETE {{baseUrl}}/reviews/invalid-uuid
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 37. Delete Review - Not Found ---- 404
+DELETE {{baseUrl}}/reviews/{{invalidReviewId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### ============================================
+### REVIEW - DELETE (ADMIN)
+### ============================================
+
+### 38. Admin Delete Review ---- 200
+DELETE {{baseUrl}}/admin/reviews/{{otherUserReviewId}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 39. Admin Delete Review - Unauthorized ---- 401
+DELETE {{baseUrl}}/admin/reviews/{{otherUserReviewId}}
+
+###
+
+### 40. Client Calls Admin API ---- 403
+DELETE {{baseUrl}}/admin/reviews/{{otherUserReviewId}}
+Authorization: Bearer {{clientToken}}
+
+###
+
+### 41. Admin Delete Invalid UUID ---- 400
+DELETE {{baseUrl}}/admin/reviews/invalid-uuid
+Authorization: Bearer {{adminToken}}
+
+###
+
+### 42. Admin Delete Review Not Found ---- 404
+DELETE {{baseUrl}}/admin/reviews/{{invalidReviewId}}
+Authorization: Bearer {{adminToken}}

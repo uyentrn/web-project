@@ -1,4 +1,4 @@
-const { forbidden, invalid, notFound, translatePrismaError } = require('./errors');
+const { forbidden, invalid, notFound, conflict, translatePrismaError } = require('./errors');
 
 class ReviewService {
   constructor(prisma) { this.prisma = prisma; }
@@ -10,10 +10,25 @@ class ReviewService {
     const product = await this.prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
     if (!product) throw notFound('Product');
     const where = { productId };
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.review.findMany({ where, select: { id: true, rating: true, comment: true, createdAt: true, updatedAt: true, user: { select: { id: true, name: true } } }, take, skip, orderBy: { createdAt: 'desc' } }),
+    const [reviews, total] = await this.prisma.$transaction([
+      this.prisma.review.findMany({ where, take, skip, orderBy:{createdAt:"desc"},
+        select:{ 
+          id:true, rating:true, comment:true, createdAt:true, updatedAt:true, 
+          user:{ select: { id:true, name:true } } 
+        }
+      }),
       this.prisma.review.count({ where }),
     ]);
+    const data = await Promise.all( reviews.map(async review => {
+      const purchaseCount = await this.prisma.order.count({
+        where: { 
+          userId: review.user.id, 
+          status: { in:["paid","shipping","completed"] },
+          items: { some: { variant: { productId } } }
+        }
+      });
+      return { ...review, purchaseCount };
+    }));
     return { data, total, limit: take, offset: skip };
   }
 
@@ -23,14 +38,32 @@ class ReviewService {
     if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) throw invalid('Rating must be an integer from 1 to 5.');
     if (comment != null && (typeof comment !== 'string' || !comment.trim())) throw invalid('Comment must be a non-empty string.');
 
-    const [product, purchase] = await this.prisma.$transaction([
-      this.prisma.product.findUnique({ where: { id: productId }, select: { id: true } }),
-      this.prisma.order.findFirst({ where: { userId, status: { in: ['paid', 'shipping', 'completed'] }, items: { some: { variant: { productId } } } }, select: { id: true } }),
-    ]);
-    if (!product) throw notFound('Product');
-    if (!purchase) throw forbidden('Only verified purchasers can review this product.');
-    try { return await this.prisma.review.create({ data: { userId, productId, rating: parsedRating, comment: comment?.trim() || null } }); }
-    catch (error) { throw translatePrismaError(error); }
+    try {
+      const [product, purchase, existingReview] = await this.prisma.$transaction([
+        this.prisma.product.findUnique({
+          where: { id: productId },
+          select: { id: true },
+        }),
+        this.prisma.order.findFirst({ 
+          where: { 
+            userId, status: { in: ['paid', 'shipping', 'completed'] }, 
+            items: { some: { variant: { productId } } } 
+          }, 
+          select: { id: true } 
+        }),
+        this.prisma.review.findUnique({ 
+          where: { userId_productId: { userId, productId }}
+        })
+      ]);
+      if (existingReview) throw conflict("You have already reviewed this product.");
+      if (!product) throw notFound('Product');
+      if (!purchase) throw forbidden('Only verified purchasers can review this product.');
+      return await this.prisma.review.create({
+        data: { userId, productId, rating: parsedRating, comment: comment?.trim() || null,},
+      });
+    } catch (error) {
+      throw translatePrismaError(error);
+    }
   }
 
   async update(userId, reviewId, { rating, comment }) {
@@ -45,10 +78,14 @@ class ReviewService {
     catch (error) { throw translatePrismaError(error); }
   }
 
-  async remove(userId, reviewId) {
-    requireId(userId, 'User'); requireId(reviewId, 'Review');
-    const review = await this.prisma.review.findFirst({ where: { id: reviewId, userId } });
+  async removeMine(userId,reviewId){
+    const review = await this.prisma.review.findFirst({ where: { id: reviewId, userId }});
     if (!review) throw notFound('Review');
+    return this.prisma.review.delete({ where: { id: reviewId } });
+  }
+  async remove(reviewId){
+    const review = await this.prisma.review.findUnique({ where: { id: reviewId } });
+    if (!review) throw notFound("Review");
     return this.prisma.review.delete({ where: { id: reviewId } });
   }
 }

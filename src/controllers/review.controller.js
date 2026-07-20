@@ -33,9 +33,13 @@ module.exports = function createReviewController(reviewService) {
       return sendSuccess(res, data);
     }),
 
-    remove: handle(async (req, res) => {
+    removeMine: handle(async (req, res) => {
       const { userId } = authenticatedUser(req);
-      await reviewService.remove(userId, id(req.params?.reviewId, 'Review ID'));
+      await reviewService.removeMine( userId, id(req.params.reviewId,"Review ID"));
+      return sendEmptySuccess(res);
+    }),
+    remove: handle(async (req, res) => {
+      await reviewService.remove( id(req.params.reviewId,"Review ID"));
       return sendEmptySuccess(res);
     }),
   };

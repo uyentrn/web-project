@@ -7,7 +7,7 @@ describe('AuthService', () => {
   beforeEach(() => jest.resetAllMocks());
 
   function createService(prisma) {
-    return new AuthService(prisma, { passwordHasher, tokenIssuer, accessTtlMs: 900000, refreshTtlMs: 86400000 });
+    return new AuthService(prisma, { passwordHasher, tokenIssuer, accessTtlMs: 9000000000, refreshTtlMs: 86400000 });
   }
 
   it('registers a user and creates a session token pair', async () => {

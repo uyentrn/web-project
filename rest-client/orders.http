@@ -4,7 +4,7 @@
 
 @baseUrl = http://localhost:3000/api
 
-@clientToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyODhkZmI4Yi1iZWYzLTRjN2UtOTdmZC1lNWEyZWJhODdhYTciLCJzaWQiOiJmYjRiZmFhZi1lMTY4LTQ2ZDAtYmE2MC0wYzUwMzhkMTBmMjciLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzg0NDczODU0LCJleHAiOjE3ODQ0NzQ3NTQsImF1ZCI6InBlcmZ1bWUtZWNvbW1lcmNlLWNsaWVudCIsImlzcyI6InBlcmZ1bWUtZWNvbW1lcmNlLWFwaSJ9.npXlsCemzdl6c271D3i3rx8WhyaHIz6i-UUVu6LvSDg
+@clientToken = 
 @adminToken = 
 @accessToken =
 
