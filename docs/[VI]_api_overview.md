@@ -17,7 +17,7 @@ Module cốt lõi để khám phá và lọc sản phẩm. Được thiết kế
 
 | Method | Endpoint | Mô tả | Auth Required |
 | :--- | :--- | :--- | :--- |
-| GET | `/api/products` | Lấy danh sách sản phẩm. Query params: `category`, `scent`, `min_price`, `limit`, `offset` | No |
+| GET | `/api/products` | Lấy danh sách sản phẩm. Query params: `category`, `brand`, `scent`, `min_price`, `limit`, `offset` | No |
 | GET | `/api/products/{id}` | Lấy thông tin chi tiết của một loại nước hoa (bao gồm các note hương) | No |
 | POST | `/api/products` | Tạo một sản phẩm mới | Yes (Admin) |
 | PUT | `/api/products/{id}` | Thay đổi thông tin của một sản phẩm | Yes (Admin) |

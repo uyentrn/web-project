@@ -52,6 +52,18 @@ GET {{baseUrl}}/products/{{invalidProductId}}
 
 ###
 
+### Get Products - Filter By Brand --- ok 200
+GET {{baseUrl}}/products?brand=cHaNeL
+###
+
+### Get Products - InvalidBrand --- ok 200
+GET {{baseUrl}}/products?brand=InvalidBrand
+###
+
+### Get Products - Empty Brand --- ok 400
+GET {{baseUrl}}/products?brand=
+###
+
 ### ============================================
 ### PRODUCTS - SEARCH
 ### ============================================

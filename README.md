@@ -30,10 +30,11 @@ serverless.yml       # AWS Lambda + HTTP API deployment
 ## Local development
 
 ```bash
-npm ci
+npm install
 cp .env.example .env
-docker compose up -d database
-npm run prisma:generate
+docker compose up -d
+npx prisma migrate dev
+npx prisma db seed
 npm run dev
 ```
 
@@ -41,15 +42,42 @@ The API listens on `http://localhost:3000`. Run automated tests with `npm test`,
 
 `DATABASE_URL` and `JWT_SECRET` are mandatory. Never commit `.env`; use a separate secret per environment.
 
+The project includes a Prisma seed script that inserts sample users, products, categories, variants, carts, orders, reviews, and related data for development and testing.
+## Database management
+
+After running migrations and seeding the database, you can inspect and edit the data using Prisma Studio:
+
+```bash
+npx prisma studio
+```
+
+Prisma Studio starts a web interface (by default at http://localhost:5555) where you can browse, create, update, and delete records from the PostgreSQL database during development.
+
 ## Database migrations
 
-Use Prisma migrations in CI/CD, never `prisma migrate dev` against production:
+Create new migrations during development with:
+```bash
+npx prisma migrate dev --name <migration_name>
+```
 
+Apply committed migrations in production with:
 ```bash
 npm run prisma:migrate:deploy
 ```
 
-This repository currently has a Prisma schema but no committed migration history. Create and review the initial migration in a non-production environment before any deployment; until then, `prisma:migrate:deploy` cannot initialize a fresh production database. Prisma recommends `migrate deploy` in an automated deployment pipeline for production changes. [Prisma migration guidance](https://docs.prisma.io/docs/orm/v6/prisma-migrate/workflows/development-and-production)
+Never use `prisma migrate dev` against a production database.
+
+## Resetting the local database
+
+To recreate the local database from scratch:
+```bash
+docker compose down -v
+docker compose up -d
+
+npx prisma migrate dev
+npx prisma db seed
+```
+The `-v` option removes the PostgreSQL data volume, resulting in a clean database.
 
 ## Docker deployment
 
@@ -88,13 +116,12 @@ The Serverless configuration deploys one ARM64 Node.js 22 Lambda behind API Gate
 ## Current limitations
 
 - User, brand, wishlist, and payment domain services/controllers are not implemented. Their registered endpoints return `501 Not Implemented`.
-- The data model has no user role field and access tokens currently do not issue role claims, so catalog write endpoints cannot be used until role provisioning is designed.
 - There are no committed Prisma migrations yet.
 - Production database networking, TLS/CA configuration, backups, monitoring/alerting, rate limiting, CORS policy, WAF, and CI/CD secret integration require environment-specific infrastructure decisions.
 - Payment processing, webhook verification, cancellation/refund workflows, and user-profile lifecycle are intentionally out of scope of the implemented services.
 
-## Specifications
+## API Documentation
 
-- [English API specification](./docs/[EN]_api_spec.md)
-- [Vietnamese API specification](./docs/[VI]_api_spec.md)
-- [Prisma schema](./src/models/schema.prisma)
+- [English API Overview](./docs/[EN]_api_overview.md)
+- [Vietnamese API Overview](./docs/[VI]_api_overview.md)
+- [Prisma Schema](./prisma/schema.prisma)

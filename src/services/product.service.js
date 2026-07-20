@@ -9,10 +9,11 @@ const productInclude = {
 class ProductService {
   constructor(prisma) { this.prisma = prisma; }
 
-  async list({ category, scent, min_price: minPrice, limit, offset } = {}) {
+  async list({ category, brand, scent, min_price: minPrice, limit, offset } = {}) {
     const { take, skip } = pagination(limit, offset);
     const where = {};
     if (category) where.category = { name: { equals: text(category, 'Category'), mode: 'insensitive' } };
+    if (brand) where.brand = { equals: text(brand, 'Brand'), mode: 'insensitive' };
     if (scent) where.notes = { some: { note: { name: { contains: text(scent, 'Scent'), mode: 'insensitive' } } } };
     if (minPrice != null) where.variants = { some: { price: { gte: decimal(minPrice, 'Minimum price') } } };
     const [data, total] = await this.prisma.$transaction([

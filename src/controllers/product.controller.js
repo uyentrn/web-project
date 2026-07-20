@@ -7,6 +7,7 @@ module.exports = function createProductController(productService) {
   function listOptions(query = {}) {
     return {
       category: optionalString(query.category, 'Category'),
+      brand: optionalString(query.brand, 'Brand'),
       scent: optionalString(query.scent, 'Scent'),
       min_price: query.min_price,
       limit: optionalPositiveInteger(query.limit, 'Limit'),
